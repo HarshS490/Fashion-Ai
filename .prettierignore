@@ -1,0 +1,4 @@
+*.json
+.prettierrc
+*.md
+./src/components/ui/*
