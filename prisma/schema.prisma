@@ -12,3 +12,84 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum AccountCategory {
+  Buyer
+  Seller
+}
+
+// update according to requirements of AI
+enum ProductType {
+  Shirt
+  TShirt
+  Pant
+  Shoes
+}
+
+enum OrderStatus {
+  Processing
+  Shipping
+  Shipped
+}
+
+model Address {
+  id       String    @id @default(cuid())
+  country  String    @default("India")
+  state    String    @default("Delhi")
+  address  String
+  orders   Order[]
+  accounts Account[]
+}
+
+model Account {
+  // details
+  id             String          @id @default(uuid())
+  username       String          @unique
+  password       String
+  email          String? // need not be unique if seller also wants to become buyer
+  phoneNumber    String? // must exist for seller
+  profilePic     String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  // account category
+  category       AccountCategory
+  // products
+  soldProducts   Product[]       @relation("sold")
+  productsBought Product[]       @relation("bought")
+  orders         Order[]
+  defaultAddress Address?        @relation(fields: [addressId], references: [id])
+  addressId      String?
+}
+
+model Product {
+  id              String      @id @default(uuid())
+  name            String      @unique
+  price           Float
+  description     String      @default("")
+  category        ProductType
+  image           String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  // stock
+  stock           Int         @default(0)
+  // seller
+  seller          Account     @relation("sold", fields: [sellerAccountId], references: [id])
+  sellerAccountId String
+  // buyers
+  buyers          Account[]   @relation("bought")
+  // orders which want this product
+  orders          Order[]     @relation("orders-product")
+}
+
+model Order {
+  id             String      @id @default(uuid())
+  status         OrderStatus
+  // products
+  products       Product[]   @relation("orders-product")
+  // buyer details
+  buyerAccount   Account?    @relation(fields: [buyerAccountId], references: [id])
+  buyerAccountId String?
+  // address
+  address        Address?    @relation(fields: [addressId], references: [id])
+  addressId      String?
+}
