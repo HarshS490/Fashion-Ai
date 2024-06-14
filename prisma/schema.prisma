@@ -68,6 +68,8 @@ model Product {
   description     String      @default("")
   category        ProductType
   image           String
+  stars           Int         @default(1)
+  comments        Comment[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   // stock
@@ -92,4 +94,13 @@ model Order {
   // address
   address        Address?    @relation(fields: [addressId], references: [id])
   addressId      String?
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  rating    Int      @default(1)
+  // relation with product
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
 }
