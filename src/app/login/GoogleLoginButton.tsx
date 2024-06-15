@@ -1,12 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
 
 const GoogleLoginButton = () => {
   return (
     <Button
       variant="outline"
       className="flex items-center rounded-3xl text-zinc-900"
+      onClick={() => signIn("google", { callbackUrl: "/login-redirect" })}
     >
       <svg
         version="1.1"

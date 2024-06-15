@@ -44,9 +44,9 @@ model Address {
 model Account {
   // details
   id             String           @id @default(uuid())
-  username       String           @unique
-  password       String
-  email          String? // need not be unique if seller also wants to become buyer
+  username       String
+  password       String?
+  email          String // need not be unique if seller also wants to become buyer
   phoneNumber    String? // must exist for seller
   profilePic     String?
   createdAt      DateTime         @default(now())

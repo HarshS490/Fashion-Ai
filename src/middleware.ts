@@ -25,4 +25,4 @@ export default withAuth(
 );
 
 // NOTE: Add those paths in matcher which are to be considered by middleware
-export const config = { matcher: [] };
+export const config = { matcher: ["/login"] };

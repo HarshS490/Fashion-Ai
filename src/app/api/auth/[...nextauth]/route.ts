@@ -23,22 +23,23 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ email, account, user, credentials, profile }) {
       if (!user.email || !user.name) return false;
-
-      // const existing = await db.account.findFirst({
-      //   where: {
-      //     email: user.email,
-      //   },
-      // });
-      // if (existing === null) {
-      // new account
-      // await db.account.create({
-      //   data: {
-      //     email: user.email,
-      //     username: user.name,
-      //     profilePic: user.image,
-      //   },
-      // });
-      // }
+      const existing_account = await db.account.findFirst({
+        where: {
+          email: user.email,
+        },
+      });
+      // create a new account
+      if (!existing_account) {
+        await db.account.create({
+          data: {
+            email: user.email,
+            username: user.name,
+            id: user.id,
+            profilePic: user.image,
+          },
+        });
+      }
+      // account already exists
       return true;
     },
   },

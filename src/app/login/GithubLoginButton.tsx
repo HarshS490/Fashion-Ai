@@ -1,10 +1,14 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
 
 const GithubLoginButton = () => {
   return (
     <Button
       variant="outline"
       className="flex items-center rounded-3xl text-zinc-900"
+      onClick={() => signIn("github", { callbackUrl: "/login-redirect" })}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
