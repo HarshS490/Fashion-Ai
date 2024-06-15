@@ -43,21 +43,21 @@ model Address {
 
 model Account {
   // details
-  id             String          @id @default(uuid())
-  username       String          @unique
+  id             String           @id @default(uuid())
+  username       String           @unique
   password       String
   email          String? // need not be unique if seller also wants to become buyer
   phoneNumber    String? // must exist for seller
   profilePic     String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   // account category
-  category       AccountCategory
+  category       AccountCategory?
   // products
-  soldProducts   Product[]       @relation("sold")
-  productsBought Product[]       @relation("bought")
+  soldProducts   Product[]        @relation("sold")
+  productsBought Product[]        @relation("bought")
   orders         Order[]
-  defaultAddress Address?        @relation(fields: [addressId], references: [id])
+  defaultAddress Address?         @relation(fields: [addressId], references: [id])
   addressId      String?
 }
 
