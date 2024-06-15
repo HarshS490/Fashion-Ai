@@ -8,7 +8,7 @@ export default withAuth(
       req.nextauth.token !== null
     ) {
       // If already logged in then redirect here
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/explore", req.url));
     }
   },
   {
@@ -25,4 +25,4 @@ export default withAuth(
 );
 
 // NOTE: Add those paths in matcher which are to be considered by middleware
-export const config = { matcher: [] };
+export const config = { matcher: ["/login"] };
