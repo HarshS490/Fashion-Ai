@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import '@smastrom/react-rating/style.css'
+
 import Provider from "./providers/client-provider";
 const inter = Inter({ subsets: ["latin"] });
 

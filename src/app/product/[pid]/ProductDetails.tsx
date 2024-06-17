@@ -2,7 +2,7 @@
 import { Product } from "@prisma/client";
 import React, { useState, useRef ,useEffect} from "react";
 import { Button } from "../../../components/ui/button";
-import ReactStars from "react-rating-stars-component";
+import { Rating as ReactRating, Star } from '@smastrom/react-rating'
 import {
   Accordion,
   AccordionContent,
@@ -25,6 +25,8 @@ import Image from "next/image";
 type Props = {
   pid: string;
 };
+
+
 
 export default function ProductDetails({ pid }: Props) {
   const [product,setProduct] = useState<Product|null>(null);
@@ -114,7 +116,8 @@ export default function ProductDetails({ pid }: Props) {
           {/* rating */}
           <div className="flex items-center gap-1">
             <span className="text-sm text-center ">{product?product.stars:0}</span>
-            <ReactStars
+            {<ReactRating style={{maxWidth:100}} value={product?product.stars:0} onChange={ratingChanged} halfFillMode="svg"/>}
+            {/* <ReactStars
               count={5}
               value={product?product.stars:0}
               onChange={ratingChanged}
@@ -124,7 +127,7 @@ export default function ProductDetails({ pid }: Props) {
               halfIcon={<i className="fa fa-star-half-alt"></i>}
               fullIcon={<i className="fa fa-star"></i>}
               activeColor="#ffd700"
-            />
+            /> */}
           </div>
           <hr className="border-slate-300" />
 
