@@ -1,6 +1,6 @@
 "use client";
 import { Product } from "@prisma/client";
-import React, { useState, useRef ,useEffect} from "react";
+import React, { useState, useRef ,useEffect,ChangeEvent} from "react";
 import { Button } from "../../../components/ui/button";
 import { Rating as ReactRating, Star } from '@smastrom/react-rating'
 import {
@@ -53,8 +53,12 @@ export default function ProductDetails({ pid }: Props) {
     },[baseUrl,pid]
   )
 
-  const handleChange = (e) => {
-    setCount(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = parseInt(e.target.value);
+    if(!isNaN(inputValue)){
+
+      setCount(inputValue);
+    }
   };
 
   const handleIncrement = () => {
@@ -143,7 +147,7 @@ export default function ProductDetails({ pid }: Props) {
                 variant={"outline"}
                 size={"icon"}
                 onClick={handleIncrement}
-                disabled={count==6}
+                disabled={count<=6}
               >
                 {<PlusIcon></PlusIcon>}
               </Button>
@@ -156,7 +160,7 @@ export default function ProductDetails({ pid }: Props) {
                 variant={"outline"}
                 size={"icon"}
                 onClick={handleDecrement}
-                disabled={count===1}
+                disabled={count>=1}
               >
                 {<MinusIcon></MinusIcon>}
               </Button>
