@@ -2,6 +2,7 @@
 
 import CategorySelector from "@/components/account/CategorySelector";
 import WidthWrapper from "@/components/global/MaxWidthWrapper";
+import ProductCard from "@/components/product/ProductCard";
 import { db } from "@/lib/db";
 import { Bolt, HandCoins, ShoppingCart, UserRoundCog } from "lucide-react";
 import { getServerSession } from "next-auth";
@@ -14,6 +15,10 @@ const Page = async ({ params: { id } }: { params: { id: string } }) => {
   const account = await db.account.findFirst({
     where: {
       id,
+    },
+    include: {
+      productsBought: true,
+      soldProducts: true,
     },
   });
 
@@ -102,7 +107,53 @@ const Page = async ({ params: { id } }: { params: { id: string } }) => {
       </main>
     );
   } else if (account.category === "Seller") {
-    return <main>{account.username} Seller</main>;
+    return (
+      <main>
+        <WidthWrapper className="min-h-screen pt-10">
+          <div className="flex flex-col items-center md:min-h-fit md:flex-row">
+            <div className="flex flex-col items-center md:flex-[1.5]">
+              {/* Profile Pic */}
+              <div className="relative size-40 rounded-full bg-gray-300 ring-4 ring-purple-400 ring-offset-2">
+                {account.profilePic && (
+                  <Image
+                    src={account.profilePic}
+                    fill
+                    alt="Profile Picture"
+                    className="pointer-events-none rounded-full"
+                  />
+                )}
+              </div>
+              <div className="text-center">
+                <h1 className="mt-4 text-5xl tracking-tighter text-zinc-900">
+                  {account.username}
+                </h1>
+                <p className="mt-1 text-muted-foreground">{account.email}</p>
+              </div>
+              {account.phoneNumber && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Phone: {account.phoneNumber}
+                </p>
+              )}
+            </div>
+          </div>
+          {/* Separator in larger screens */}
+          <div
+            aria-hidden
+            className="mx-auto my-10 hidden h-[2px] w-3/4 rounded-lg bg-purple-200 md:block"
+          ></div>
+          <div>
+            <h2 className="mt-10 text-3xl tracking-tight">Products Sold</h2>
+            <div className="mt-5 flex items-center gap-5">
+              {account.soldProducts.map((product) => (
+                <div key={product.id}>
+                  <ProductCard about={product} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </WidthWrapper>
+      </main>
+    );
   } else {
     const session = await getServerSession();
     if (!session || !session.user || !session.user.email) return notFound();
