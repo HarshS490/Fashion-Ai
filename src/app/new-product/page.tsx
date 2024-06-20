@@ -16,20 +16,50 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Check,
+  ChevronsUpDown,
+  ImageUp,
+  SquareChevronDown,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { new_product } from "@/validators/zod-validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { Product } from "@prisma/client";
+import { useDropzone } from "react-dropzone";
+import { Account, Product } from "@prisma/client";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   // toggle bar
   const [open, setOpen] = useState<boolean>(false);
   const options = ["Shirt", "TShirt", "Pant", "Shoes"] as const;
   const [value, setValue] = useState<(typeof options)[number] | null>(null);
+  const [image, setImage] = useState<null | File>(null);
+  const [account, setAccount] = useState<Account | null>(null);
+  const router = useRouter();
+
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (!session || !session.user || !session.user.email) {
+      // this won't happen due to middleware
+      return;
+    }
+    const fetch_account = async () => {
+      const response = await fetch(`/api/account?email=${session.user?.email}`);
+      if (!response.ok) {
+        // the account has logged in but is not in database
+        router.push("/login");
+      } else {
+        const result = (await response.json()) as Account;
+        setAccount(result);
+      }
+    };
+    fetch_account();
+  }, []);
 
   const {
     register,
@@ -40,9 +70,16 @@ const Page = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof new_product>) => {
+    if (!account) {
+      return;
+    }
     if (!value) {
       toast.error("Please select the product category");
       setOpen(true);
+      return;
+    }
+    if (!image) {
+      toast.error("No image selected!");
       return;
     }
     const product = {
@@ -51,9 +88,45 @@ const Page = () => {
       description: data.description,
       // TODO: Make discount part of db, and also allow percentages
       price: data.sale_price - data.discount,
+      sellerAccountId: account.id,
+      // TODO: Encode image which can be saved in database
+      image: image.name,
     };
     console.log(product);
   };
+
+  // dropzone
+  const onImageDrop = useCallback(
+    (
+      acceptedFiles: File[],
+      rejectedFiles: Array<{
+        errors: Array<{ code: string; message: string }>;
+      }>,
+    ) => {
+      if (rejectedFiles.length !== 0) {
+        toast.error(rejectedFiles[0].errors[0].message);
+        return;
+      }
+      if (acceptedFiles.length > 1) {
+        toast.error("Only a single image can be uploaded as of now");
+        return;
+      }
+      setImage(acceptedFiles[0]);
+    },
+    [],
+  );
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: onImageDrop,
+    multiple: false,
+    onError(err) {
+      toast.error("Error in uploading image, please try again later");
+    },
+    accept: {
+      "image/png": [],
+      "image/jpeg": [],
+    },
+    maxSize: 200_000,
+  });
 
   return (
     <div className="min-h-screen bg-zinc-50 py-5 text-zinc-900">
@@ -168,11 +241,37 @@ const Page = () => {
           </form>
         </div>
         {/* Images */}
-        <div className="flex flex-1 flex-row-reverse justify-center gap-10 rounded-3xl bg-white p-5 shadow-sm md:block md:shadow-xl">
+        <div className="flex-1 justify-center gap-10 rounded-3xl bg-white p-5 shadow-sm md:block md:shadow-xl">
           <div>
             <h2 className="font-bold tracking-tight">Product Image</h2>
-            {/* TODO: Add upload functionality */}
-            <div className="my-5 aspect-square w-full rounded-lg bg-zinc-100 outline-dashed outline-1 outline-zinc-500 md:w-1/3"></div>
+            {image ? (
+              <div className="mb-5 mt-2 aspect-square w-full max-w-52 rounded-lg">
+                <img
+                  src={URL.createObjectURL(image)}
+                  className="h-full w-full rounded-lg object-cover"
+                />
+              </div>
+            ) : (
+              <div {...getRootProps()} className="mb-5 mt-2">
+                <input {...getInputProps()} multiple={false} />
+                {isDragActive ? (
+                  <div className="flex aspect-square w-full max-w-52 flex-col items-center justify-center rounded-lg bg-teal-50 outline-dashed outline-2 outline-emerald-400">
+                    <SquareChevronDown className="size-10 text-emerald-400" />
+                    <p className="mt-2 text-sm text-emerald-400">
+                      Release here!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex aspect-square w-full max-w-52 cursor-pointer flex-col items-center justify-center rounded-lg bg-zinc-50 outline-dashed outline-2 outline-zinc-400 hover:bg-violet-50">
+                    <ImageUp className="size-10" />
+                    <p className="mt-2 text-sm">Click to upload</p>
+                    <p className="text-sm text-muted-foreground">
+                      or, drag and drop
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div>
             {/* Product Category */}

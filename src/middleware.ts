@@ -10,6 +10,12 @@ export default withAuth(
       // If already logged in then redirect here
       return NextResponse.redirect(new URL("/explore", req.url));
     }
+    if (
+      req.nextUrl.pathname.startsWith("/new-product") &&
+      req.nextauth.token === null
+    ) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   },
   {
     callbacks: {
@@ -25,4 +31,4 @@ export default withAuth(
 );
 
 // NOTE: Add those paths in matcher which are to be considered by middleware
-export const config = { matcher: ["/login"] };
+export const config = { matcher: ["/login", "/new-product"] };
