@@ -29,9 +29,10 @@ import { new_product } from "@/validators/zod-validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
-import { Account, Product } from "@prisma/client";
+import { Account } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Page = () => {
   // toggle bar
@@ -59,7 +60,7 @@ const Page = () => {
       }
     };
     fetch_account();
-  }, []);
+  }, [router, session]);
 
   const {
     register,
@@ -245,10 +246,12 @@ const Page = () => {
           <div>
             <h2 className="font-bold tracking-tight">Product Image</h2>
             {image ? (
-              <div className="mb-5 mt-2 aspect-square w-full max-w-52 rounded-lg">
-                <img
+              <div className="relative mb-5 mt-2 aspect-square w-full max-w-52 rounded-lg">
+                <Image
+                  alt=""
                   src={URL.createObjectURL(image)}
-                  className="h-full w-full rounded-lg object-cover"
+                  className="rounded-lg object-cover"
+                  fill
                 />
               </div>
             ) : (

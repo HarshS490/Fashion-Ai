@@ -103,7 +103,7 @@ export default function ProductDetails({ pid }: Props) {
         <div className="flex flex-col gap-2 p-4 w-9/12 md:w-2/4 ">
           <h1 className="text-3xl font-medium">{product?product.name:"Product Name"}</h1>
           <p className="text-sm">
-            {product && product.stock >= 1 ? (
+            {product  ? (
               <span className="block font-semibold text-green-700">
                 In Stock
               </span>
