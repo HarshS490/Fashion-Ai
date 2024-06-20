@@ -63,6 +63,14 @@ model Account {
   addressId      String?
 }
 
+model Stock {
+  id        String   @id @default(uuid())
+  size      String
+  amount    Int
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+}
+
 model Product {
   id              String      @id @default(uuid())
   name            String      @unique
@@ -74,8 +82,6 @@ model Product {
   comments        Comment[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  // stock
-  stock           Int         @default(0)
   // seller
   seller          Account     @relation("sold", fields: [sellerAccountId], references: [id])
   sellerAccountId String
@@ -83,6 +89,8 @@ model Product {
   buyers          Account[]   @relation("bought")
   // orders which want this product
   orders          Order[]     @relation("orders-product")
+  // stock
+  stock           Stock[]
 }
 
 model Order {
