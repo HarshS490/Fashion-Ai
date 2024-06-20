@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Command,
   CommandGroup,
@@ -19,11 +18,42 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { new_product } from "@/validators/zod-validators";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { Product } from "@prisma/client";
 
 const Page = () => {
+  // toggle bar
   const [open, setOpen] = useState<boolean>(false);
   const options = ["Shirt", "TShirt", "Pant", "Shoes"] as const;
-  const [value, setValue] = useState<(typeof options)[number]>("Shoes");
+  const [value, setValue] = useState<(typeof options)[number] | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof new_product>>({
+    resolver: zodResolver(new_product),
+  });
+
+  const onSubmit = async (data: z.infer<typeof new_product>) => {
+    if (!value) {
+      toast.error("Please select the product category");
+      setOpen(true);
+      return;
+    }
+    const product = {
+      name: data.name,
+      category: value,
+      description: data.description,
+      // TODO: Make discount part of db, and also allow percentages
+      price: data.sale_price - data.discount,
+    };
+    console.log(product);
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 py-5 text-zinc-900">
@@ -47,17 +77,27 @@ const Page = () => {
                   Product Name
                 </label>
                 <Input
-                  className="mt-1 rounded-lg"
+                  {...register("name")}
+                  className={cn(
+                    "mt-1 rounded-lg",
+                    errors.name && "bg-rose-100 focus-visible:ring-red-200",
+                  )}
                   id="product-name"
                   placeholder="Fashionable TShirt"
                 />
               </div>
               <div className="grow">
+                {/* TODO: Brand name is not stored in db !? */}
                 <label className="font-semibold" htmlFor="brand-name">
                   Brand Name
                 </label>
                 <Input
-                  className="mt-1 rounded-lg"
+                  {...register("brand_name")}
+                  className={cn(
+                    "mt-1 rounded-lg",
+                    errors.brand_name &&
+                      "bg-rose-100 focus-visible:ring-red-200",
+                  )}
                   id="brand-name"
                   placeholder="Adidas"
                 />
@@ -69,7 +109,12 @@ const Page = () => {
                 Description
               </label>
               <Textarea
-                className="my-2 block w-full rounded-lg p-2 text-zinc-700"
+                {...register("description")}
+                className={cn(
+                  "my-2 block w-full rounded-lg p-2 text-zinc-700",
+                  errors.description &&
+                    "bg-rose-100 focus-visible:ring-red-200",
+                )}
                 rows={5}
               />
             </div>
@@ -79,50 +124,31 @@ const Page = () => {
                 <label className="font-semibold" htmlFor="product-price">
                   Sale Price
                 </label>
-                <Input id="product-price" placeholder="₹100.0" />
+                <Input
+                  {...register("sale_price")}
+                  id="product-price"
+                  placeholder="₹100.0"
+                  className={cn(
+                    errors.sale_price &&
+                      "bg-rose-100 focus-visible:ring-red-200",
+                  )}
+                />
               </div>
               <div className="grow">
                 <label className="font-semibold" htmlFor="brand-discount">
                   Discount
                 </label>
-                <Input id="brand-discount" placeholder="₹20.0" />
-              </div>
-            </div>
-            <div className="my-5 flex flex-col justify-center gap-5 md:flex-row md:items-center">
-              {/* Stock */}
-              <div className="grow">
-                <label className="font-semibold" htmlFor="product-stock">
-                  Stock
-                </label>
                 <Input
-                  className="mt-1 rounded-lg"
-                  id="product-stock"
-                  placeholder="150"
+                  id="brand-discount"
+                  placeholder="₹0.0"
+                  {...register("discount")}
+                  className={cn(
+                    errors.discount && "bg-rose-100 focus-visible:ring-red-200",
+                  )}
                 />
               </div>
-              {/* Size available */}
-              <div className="grow">
-                <label className="font-semibold" htmlFor="product-size">
-                  Select the sizes
-                </label>
-                <div className="my-1 w-fit">
-                  <ToggleGroup type="multiple">
-                    <ToggleGroupItem value="S" aria-label="Toggle small">
-                      S
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="M" aria-label="Toggle medium">
-                      M
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="L" aria-label="Toggle large">
-                      L
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="XL" aria-label="Toggle extra large">
-                      XL
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
-              </div>
             </div>
+
             {/* Separator */}
             <div aria-hidden className="grow"></div>
             <div className="mb-10 flex items-center justify-between">
@@ -133,9 +159,7 @@ const Page = () => {
                 <Button
                   type="submit"
                   className="mt-2 block w-full rounded-xl bg-purple-700 hover:bg-purple-600"
-                  onClick={(e) => {
-                    e.preventDefault();
-                  }}
+                  onClick={() => handleSubmit(onSubmit)()}
                 >
                   Publish
                 </Button>
@@ -161,7 +185,7 @@ const Page = () => {
                   aria-expanded={open}
                   className="w-[200px] justify-between"
                 >
-                  {options.find((option) => option === value)}
+                  {value ?? "Select category"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -175,8 +199,7 @@ const Page = () => {
                           key={option}
                           value={option}
                           onSelect={(currentValue) => {
-                            // The current value will always be valid
-                            // @ts-ignore
+                            // @ts-ignore - The value selected will always be valid
                             setValue(currentValue);
                             setOpen(false);
                           }}
