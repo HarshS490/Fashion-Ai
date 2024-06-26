@@ -20,6 +20,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { addToCart } from "@/utils/cart";
+import { number } from "zod";
+import { Prisma } from "@prisma/client";
 
 
 type Props = {
@@ -29,7 +32,7 @@ type Props = {
 
 
 export default function ProductDetails({ pid }: Props) {
-  const [product,setProduct] = useState<Product|null>(null);
+  const [product,setProduct] = useState<Prisma.ProductGetPayload<{include: {stock: true}}>|null>(null);
   const [count, setCount] = useState(1);
   const containerRef = useRef(null);
   const baseUrl = global.window?.location?.origin;
@@ -81,6 +84,13 @@ export default function ProductDetails({ pid }: Props) {
     }
   };
 
+  const addItem = ()=>{
+    if(product?.id){
+      addToCart(product.id,count);
+    }
+  }
+
+
   return (
     <div className="mx-auto w-5/6">
       <div className="flex w-full flex-col items-center gap-8 p-4 md:flex md:flex-row md:justify-evenly md:items-start min-w-[520px] md:min-w-[800px]">
@@ -121,17 +131,6 @@ export default function ProductDetails({ pid }: Props) {
           <div className="flex items-center gap-1">
             <span className="text-sm text-center ">{product?product.stars:0}</span>
             {<ReactRating style={{maxWidth:100}} value={product?product.stars:0} onChange={ratingChanged} halfFillMode="svg"/>}
-            {/* <ReactStars
-              count={5}
-              value={product?product.stars:0}
-              onChange={ratingChanged}
-              size={20}
-              isHalf={true}
-              emptyIcon={<i className="far fa-star"></i>}
-              halfIcon={<i className="fa fa-star-half-alt"></i>}
-              fullIcon={<i className="fa fa-star"></i>}
-              activeColor="#ffd700"
-            /> */}
           </div>
           <hr className="border-slate-300" />
 
@@ -147,7 +146,7 @@ export default function ProductDetails({ pid }: Props) {
                 variant={"outline"}
                 size={"icon"}
                 onClick={handleIncrement}
-                disabled={count<=6}
+                disabled={count>=Math.min(6,(product? product.stock.length:0))}
               >
                 {<PlusIcon></PlusIcon>}
               </Button>
@@ -160,22 +159,25 @@ export default function ProductDetails({ pid }: Props) {
                 variant={"outline"}
                 size={"icon"}
                 onClick={handleDecrement}
-                disabled={count>=1}
+                disabled={count<=1}
               >
                 {<MinusIcon></MinusIcon>}
               </Button>
             </div>
             <div className="flex justify-evenly gap-5">
-              <Button variant={"default"}>
+              <Button variant={"default"} onClick={addItem}>
                 Add to &nbsp;
                 <ShoppingCart />
               </Button>
-              <Button
-                variant={"default"}
-                className="bg-green-900 hover:bg-green-700"
-              >
-                Buy now
-              </Button>
+              <Link href={'/cart'}>
+                <Button
+                  variant={"default"}
+                  className="bg-green-900 hover:bg-green-700"
+                  onClick={addItem}
+                >
+                  Buy now
+                </Button>
+              </Link> 
             </div>
           </div>
 
