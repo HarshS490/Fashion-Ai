@@ -22,6 +22,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { addToCart } from "@/utils/cart";
 import { number } from "zod";
+import { Prisma } from "@prisma/client";
 
 
 type Props = {
@@ -31,7 +32,7 @@ type Props = {
 
 
 export default function ProductDetails({ pid }: Props) {
-  const [product,setProduct] = useState<Product|null>(null);
+  const [product,setProduct] = useState<Prisma.ProductGetPayload<{include: {stock: true}}>|null>(null);
   const [count, setCount] = useState(1);
   const containerRef = useRef(null);
   const baseUrl = global.window?.location?.origin;
@@ -112,7 +113,7 @@ export default function ProductDetails({ pid }: Props) {
         <div className="flex flex-col gap-2 p-4 w-9/12 md:w-2/4 ">
           <h1 className="text-3xl font-medium">{product?product.name:"Product Name"}</h1>
           <p className="text-sm">
-            {product && product.stock >= 1 ? (
+            {product  ? (
               <span className="block font-semibold text-green-700">
                 In Stock
               </span>
@@ -145,7 +146,7 @@ export default function ProductDetails({ pid }: Props) {
                 variant={"outline"}
                 size={"icon"}
                 onClick={handleIncrement}
-                disabled={count>=Math.min(6,(product?product.stock:0))}
+                disabled={count>=Math.min(6,(product? product.stock.length:0))}
               >
                 {<PlusIcon></PlusIcon>}
               </Button>

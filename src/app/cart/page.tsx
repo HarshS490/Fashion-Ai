@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { getCartData, removeFromCart, updateCartData } from "@/utils/cart";
 import { ArrowLeftIcon, ChevronLeft } from "lucide-react";
-import { Product } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import CartItemCard from "@/components/cart/CartItemCard";
 import Summary from "@/components/cart/Summary";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 type Props = {};
 
-export type CartProduct = Product & {
+export type CartProduct = Prisma.ProductGetPayload<{include: {stock: true}}> & {
   quantity: number;
 };
 
@@ -73,7 +73,7 @@ const Page = ({}: Props) => {
       let fetchedData = [];
       const fetchData = async () => {
         const products = await getProducts(productList);
-        fetchedData = products.map((product: Product) => {
+        fetchedData = products.map((product: Prisma.ProductGetPayload<{include: {stock:true}}>) => {
           let index = productList.findIndex((id) => id === product.id);
           if (index !== -1) {
             return {

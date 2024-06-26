@@ -4,22 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import {  Trash2,PlusIcon, MinusIcon } from "lucide-react";
+import { Prisma } from "@prisma/client";
 
 
 type Props = {
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    description: string;
-    category: string;
-    image: string;
-    stars: number;
-    createdAt: Date;
-    updatedAt: Date;
-    stock: number;
-    sellerAccountId: string;
-  };
+  product: Prisma.ProductGetPayload<{include: {stock:true}}>;
   deleteFromCart: (id: string) => void;
   updateCart: (id: string, qty: number) => void;
 };
@@ -79,7 +68,7 @@ export default function CartItemCard({
                   &#8377;{product.price}
                 </span>
               </div>
-              {product?.stock >= 1 ? (
+              {product?.stock.length >= 1 ? (
                 <span className="text-xs font-medium text-green-500">
                   In Stock
                 </span>
@@ -98,7 +87,7 @@ export default function CartItemCard({
                   size={"icon"}
                   className="h-8 w-8"
                   onClick={handleIncrement}
-                  disabled={count >= Math.min(6, (product?product.stock:0))}
+                  disabled={count >= Math.min(6, (product?product.stock.length:0))}
                 >
                   {<PlusIcon></PlusIcon>}
                 </Button>
