@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {db} from "@/lib/db";
+import { ProductInput } from "@/app/types/product-types";
 
 export async function GET(
     request:NextRequest,
@@ -20,4 +21,42 @@ export async function GET(
         return NextResponse.json({product});
     } catch (error) {
     }
+}
+
+export async function POST(request: NextRequest) {
+    const product = (await request.json()) as ProductInput;
+    let id;
+    try {
+        const {id: newId} = await db.product.create({
+            data: {
+                category: product.category,
+                image: product.image,
+                name: product.name,
+                price: product.price,
+                description: product.description,
+                stock: {
+                createMany: {
+                    data: product.stock.map((stock) => ({
+                    size: stock.size,
+                    amount: stock.quantity,
+                    })),
+                },
+                },
+                sellerAccountId: product.sellerAccountId,
+            },
+        });
+        id=newId
+    } catch (e: any) {
+        if (e.code === "P2002") {
+        // unique name constraint failed
+        return NextResponse.json(
+            { message: "Unique constraint violated" },
+            { status: 400 },
+        );
+        } else {
+        return NextResponse.json({ message: e }, { status: 500 });
+        }
+    }
+
+    return NextResponse.json({id}, { status: 200 });
 }

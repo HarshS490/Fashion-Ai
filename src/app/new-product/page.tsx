@@ -45,6 +45,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ProductInput } from "../types/product-types";
 
 const Page = () => {
   // toggle bar
@@ -124,6 +125,14 @@ const Page = () => {
     resolver: zodResolver(new_product),
   });
 
+  const fileToBase64 = (file: File) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+
   const onSubmit = async (data: z.infer<typeof new_product>) => {
     if (!account) {
       return;
@@ -141,18 +150,32 @@ const Page = () => {
       toast.error("Please enter a new stock!");
       return;
     }
-    const product = {
+    const img_base64 = (await fileToBase64(image)) as string;
+
+    const product: ProductInput = {
       name: data.name,
       category: productCategory,
       description: data.description,
       // TODO: Make discount part of db, and also allow percentages
       price: data.sale_price - data.discount,
       sellerAccountId: account.id,
-      // TODO: Encode image which can be saved in database
-      image: image.name,
+      image: img_base64,
       stock: stocks,
     };
-    console.log(product);
+    const response = await fetch("/api/product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(product),
+    });
+    if (!response.ok) {
+      if (response.status === 400)
+        throw new Error("Product name is not unique");
+      throw new Error("An error occurred, please try again later");
+    }
+    const { id } = (await response.json()) as { id: string };
+    router.push(`/product/${id}`);
   };
 
   // dropzone
@@ -373,7 +396,13 @@ const Page = () => {
                 <Button
                   type="submit"
                   className="mt-2 block w-full rounded-xl bg-purple-700 hover:bg-purple-600"
-                  onClick={() => handleSubmit(onSubmit)()}
+                  onClick={async () => {
+                    toast.promise(handleSubmit(onSubmit)(), {
+                      loading: "Uploading new product",
+                      error: (err) => err.message,
+                      success: "Product uploaded successfully",
+                    });
+                  }}
                 >
                   Publish
                 </Button>
