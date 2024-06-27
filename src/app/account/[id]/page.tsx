@@ -3,6 +3,13 @@
 import CategorySelector from "@/components/account/CategorySelector";
 import WidthWrapper from "@/components/global/MaxWidthWrapper";
 import ProductCard from "@/components/product/ProductCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { db } from "@/lib/db";
 import { Bolt, HandCoins, ShoppingCart, UserRoundCog } from "lucide-react";
 import { getServerSession } from "next-auth";
@@ -142,14 +149,24 @@ const Page = async ({ params: { id } }: { params: { id: string } }) => {
             className="mx-auto my-10 hidden h-[2px] w-3/4 rounded-lg bg-purple-200 md:block"
           ></div>
           <div>
-            <h2 className="mt-10 text-3xl tracking-tight">Products Sold</h2>
-            <div className="mt-5 flex items-center gap-5">
-              {account.soldProducts.map((product) => (
-                <div key={product.id}>
-                  <ProductCard about={product} />
-                </div>
-              ))}
-            </div>
+            <h2 className="m-10 text-3xl tracking-tight">Your products</h2>
+            <Carousel
+              className="mx-auto my-5 min-h-fit w-[80%]"
+              opts={{ align: "start" }}
+            >
+              <CarouselContent className="-ml-2">
+                {account.soldProducts.map((product) => (
+                  <CarouselItem
+                    key={product.id}
+                    className="h-full basis-1/2 pl-2 md:basis-1/3 lg:basis-1/4"
+                  >
+                    <ProductCard about={product} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           </div>
         </WidthWrapper>
       </main>
