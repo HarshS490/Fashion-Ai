@@ -40,7 +40,7 @@ export default function Home() {
                 worldwide.
               </p>
               <Link
-                href="/login"
+                href="/about"
                 className={cn(
                   buttonVariants({ variant: "default" }),
                   "mx-auto my-10 flex w-fit items-center rounded-3xl bg-purple-700 px-10 py-7 text-base font-light tracking-widest hover:bg-purple-600 md:ml-10",
