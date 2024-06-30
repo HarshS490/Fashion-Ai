@@ -37,12 +37,12 @@ const Navbar = ({ className }: { className?: string }) => {
       <nav className="flex items-center justify-between pt-7">
         <div className="font-bold text-zinc-700">LOGO</div>
         <div className="grow">
-          <ul className="ml-auto mr-14 hidden w-fit items-center md:flex">
+          <ul className="fixed bottom-10 left-1/2 z-[20] ml-auto mr-14 flex w-[80vw] min-w-fit -translate-x-1/2 items-center justify-center rounded-xl border border-zinc-300 bg-white py-5 shadow-lg md:w-[50vw] lg:static lg:flex lg:w-fit lg:border-none lg:bg-transparent lg:py-0 lg:shadow-none">
             <Link
               href="/"
               className={cn(
                 buttonVariants({ variant: "link" }),
-                "text-base",
+                "block text-sm md:text-base",
                 pathname === "/" ? "text-purple-800" : "text-muted-foreground",
               )}
             >
@@ -52,7 +52,7 @@ const Navbar = ({ className }: { className?: string }) => {
               href="/explore"
               className={cn(
                 buttonVariants({ variant: "link" }),
-                "text-base",
+                "block text-sm md:text-base",
                 pathname.includes("/explore")
                   ? "text-purple-800"
                   : "text-muted-foreground",
@@ -64,7 +64,7 @@ const Navbar = ({ className }: { className?: string }) => {
               href="/contact"
               className={cn(
                 buttonVariants({ variant: "link" }),
-                "text-base",
+                "block text-sm md:text-base",
                 pathname.includes("/contact")
                   ? "text-purple-800"
                   : "text-muted-foreground",
@@ -76,7 +76,7 @@ const Navbar = ({ className }: { className?: string }) => {
               href="/about"
               className={cn(
                 buttonVariants({ variant: "link" }),
-                "text-base",
+                "block text-sm md:text-base",
                 pathname.includes("/about")
                   ? "text-purple-800"
                   : "text-muted-foreground",
@@ -99,42 +99,46 @@ const Navbar = ({ className }: { className?: string }) => {
                 className="rounded-full"
               />
             </button>
-            {navOptionsOpen && (
-              <div className="absolute right-2 top-14 z-10 w-[30vw] min-w-fit max-w-[40vw] rounded-lg bg-[rgba(228,228,231,0.6)] px-5 py-2 backdrop-blur-lg">
-                <ul>
-                  <li className="truncate text-xl font-bold tracking-tight">
-                    {account ? (
-                      <Link
-                        href={`/account/${account.id}`}
-                        className="hover:underline"
-                      >
-                        <span className="block">{session.user?.name}</span>
-                        <span className="block text-xs font-light text-muted-foreground">
-                          {session.user?.email}
-                        </span>
-                      </Link>
-                    ) : (
-                      <div className="text-muted-foreground">
-                        <span className="block">{session.user?.name}</span>
-                        <span className="block text-xs font-light text-muted-foreground">
-                          {session.user?.email}
-                          <Loader2 className="ml-1.5 inline-block size-5 animate-spin" />
-                        </span>
-                      </div>
-                    )}
-                  </li>
-                  <li className="mt-5">
-                    <Button
-                      className="ml-auto block w-fit"
-                      onClick={() => signOut()}
+
+            <div
+              className={cn(
+                "absolute right-2 top-14 z-10 w-[30vw] min-w-fit max-w-[40vw] rounded-lg bg-[rgba(228,228,231,0.6)] px-5 py-2 backdrop-blur-lg transition-all",
+                navOptionsOpen ? "opacity-100" : "-translate-y-3 opacity-0",
+              )}
+            >
+              <ul>
+                <li className="truncate text-xl font-bold tracking-tight">
+                  {account ? (
+                    <Link
+                      href={`/account/${account.id}`}
+                      className="hover:underline"
                     >
-                      <LogOut className="mr-1.5 inline-block size-5" />
-                      Sign Out
-                    </Button>
-                  </li>
-                </ul>
-              </div>
-            )}
+                      <span className="block">{session.user?.name}</span>
+                      <span className="block text-xs font-light text-muted-foreground">
+                        {session.user?.email}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="text-muted-foreground">
+                      <span className="block">{session.user?.name}</span>
+                      <span className="block text-xs font-light text-muted-foreground">
+                        {session.user?.email}
+                        <Loader2 className="ml-1.5 inline-block size-5 animate-spin" />
+                      </span>
+                    </div>
+                  )}
+                </li>
+                <li className="mt-5">
+                  <Button
+                    className="ml-auto block w-fit"
+                    onClick={() => signOut()}
+                  >
+                    <LogOut className="mr-1.5 inline-block size-5" />
+                    Sign Out
+                  </Button>
+                </li>
+              </ul>
+            </div>
           </div>
         ) : status === "loading" ? (
           <div className="flex items-center gap-5">
