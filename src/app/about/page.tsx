@@ -5,6 +5,13 @@ import { cn } from "@/lib/utils";
 import { Satisfy } from "next/font/google";
 import Image from "next/image";
 import DevCarousel from "./DevCarousel";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Copyright } from "lucide-react";
 
 const fancy_font = Satisfy({
   weight: "400",
@@ -12,6 +19,49 @@ const fancy_font = Satisfy({
 });
 
 const Page = () => {
+  const faqs = [
+    {
+      questionContent: "Can I start buying and selling on this website?",
+      answerContent:
+        "Not yet, we are working relentlessly to make this idea real, but the website is still in its prototype stage",
+    },
+    {
+      questionContent: "When will the website be available for general use?",
+      answerContent:
+        "We are working hard in solving all the bugs and adding new features, but it will take time to make everything functional",
+    },
+    {
+      questionContent: "Why is X not working?",
+      answerContent:
+        "There are multiple bugs and glitches which we still need to fix. If you found an issue, you can raise it in our GitHub",
+    },
+    {
+      questionContent: "The page X is not found / X button does nothing",
+      answerContent:
+        "A large number of features are yet to be implemented, but we have laid the foundation for them",
+    },
+    {
+      questionContent: "Is it unsafe to sign in to the website just now?",
+      answerContent:
+        "Although in its initial stage, the account system is managed via OAuth which is completely secure. You need not worry about privacy",
+    },
+    {
+      questionContent: "I uploaded something but now it's no longer visible",
+      answerContent:
+        "Because the website is still in it's pre-alpha stage, we change database regularly as a result of which your data might get lost",
+    },
+    {
+      questionContent:
+        "I found something inappropriate, how should I report it?",
+      answerContent:
+        "The options to report content has not yet been developed, but you can always contact one of the developers from their contact",
+    },
+    {
+      questionContent: "I also want to contribute",
+      answerContent:
+        "First of all, thanks for considering our project! We would love to collaborate with you in GitHub. Just ping any one of the developers",
+    },
+  ];
   return (
     <div>
       <Navbar className="sticky top-0 z-10 bg-white pb-5" />
@@ -66,8 +116,32 @@ const Page = () => {
           </div>
           {/* Carousel of developer profiles */}
           <DevCarousel />
+          {/* FAQs */}
+          <div>
+            <h2 className="mb-5 mt-10 text-center text-5xl font-bold text-zinc-800 md:text-left">
+              FAQs
+            </h2>
+            <Accordion
+              type="multiple"
+              className="mx-auto mb-2 max-w-prose md:mx-0 md:mt-2"
+            >
+              {faqs.map(({ questionContent, answerContent }, idx) => (
+                <AccordionItem value={`item-${idx}`} key={idx}>
+                  <AccordionTrigger>{questionContent}</AccordionTrigger>
+                  <AccordionContent className="text-base">
+                    {answerContent}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
         </WidthWrapper>
       </main>
+      <footer className="block bg-zinc-800 py-16 text-zinc-100 lg:py-5">
+        <p className="mx-auto flex w-fit items-center justify-center gap-1.5 lg:mr-10">
+          <Copyright className="inline-block h-5 w-5" /> All rights reserved
+        </p>
+      </footer>
     </div>
   );
 };
