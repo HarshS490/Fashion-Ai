@@ -127,7 +127,9 @@ const Page = () => {
             >
               {faqs.map(({ questionContent, answerContent }, idx) => (
                 <AccordionItem value={`item-${idx}`} key={idx}>
-                  <AccordionTrigger>{questionContent}</AccordionTrigger>
+                  <AccordionTrigger className="text-left">
+                    {questionContent}
+                  </AccordionTrigger>
                   <AccordionContent className="text-base">
                     {answerContent}
                   </AccordionContent>
