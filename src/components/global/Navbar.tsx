@@ -103,7 +103,9 @@ const Navbar = ({ className }: { className?: string }) => {
             <div
               className={cn(
                 "absolute right-2 top-14 z-10 w-[30vw] min-w-fit max-w-[40vw] rounded-lg bg-[rgba(228,228,231,0.6)] px-5 py-2 backdrop-blur-lg transition-all",
-                navOptionsOpen ? "opacity-100" : "-translate-y-3 opacity-0",
+                navOptionsOpen
+                  ? "opacity-100"
+                  : "pointer-events-none -translate-y-3 opacity-0",
               )}
             >
               <ul>
