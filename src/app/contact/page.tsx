@@ -1,39 +1,23 @@
-"use client";
-
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-
-import { dev_profiles } from "../data/dev_data";
-
 import Link from "next/link";
-import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
+import { dev_profiles } from "../data/dev_data";
+import Navbar from "@/components/global/Navbar";
+import WidthWrapper from "@/components/global/MaxWidthWrapper";
+import { Copyright } from "lucide-react";
 
-const DevCarousel = () => {
+const Page = () => {
   return (
-    <div className="relative mx-auto my-10 w-[80%] lg:w-full">
-      <Carousel
-        plugins={[
-          //@ts-ignore
-          Autoplay({
-            delay: 2000,
-            stopOnInteraction: true,
-          }),
-        ]}
-      >
-        <CarouselContent>
+    <div className="flex min-h-screen flex-col justify-between">
+      <Navbar />
+      <WidthWrapper className="grow">
+        <h1 className="mb-10 mt-5 text-5xl font-bold tracking-tight">
+          Contact
+        </h1>
+        <div className="mb-5 grid grid-cols-1 grid-rows-4 gap-5 sm:grid-cols-2 sm:grid-rows-2 lg:grid-cols-4 lg:grid-rows-1">
           {dev_profiles.map(
             ({ name, photo, role, description, github, linkedin }, idx) => (
-              <CarouselItem
-                className="select-none sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-                key={idx}
-              >
-                <div className="flex aspect-square w-full flex-col items-center gap-2 rounded-3xl border border-zinc-200 px-2 py-3">
+              <div className="max-w-prose" key={idx}>
+                <div className="flex aspect-square w-full flex-col items-center gap-2 rounded-3xl border px-2 py-3 shadow-md">
                   <div className="relative aspect-square grow">
                     <Image
                       src={photo}
@@ -80,15 +64,18 @@ const DevCarousel = () => {
                     </Link>
                   </div>
                 </div>
-              </CarouselItem>
+              </div>
             ),
           )}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+        </div>
+      </WidthWrapper>
+      <footer className="block bg-zinc-800 py-16 text-zinc-100 lg:py-5">
+        <p className="mx-auto flex w-fit items-center justify-center gap-1.5 lg:mr-10">
+          <Copyright className="inline-block h-5 w-5" /> All rights reserved
+        </p>
+      </footer>
     </div>
   );
 };
 
-export default DevCarousel;
+export default Page;
